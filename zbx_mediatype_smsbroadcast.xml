@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>5.0</version>
+    <date>2022-02-15T02:06:45Z</date>
+    <media_types>
+        <media_type>
+            <name>SMS Broadcast</name>
+            <type>WEBHOOK</type>
+            <parameters>
+                <parameter>
+                    <name>message</name>
+                    <value>{ALERT.MESSAGE}</value>
+                </parameter>
+                <parameter>
+                    <name>password</name>
+                    <value>password</value>
+                </parameter>
+                <parameter>
+                    <name>to</name>
+                    <value>{ALERT.SENDTO}</value>
+                </parameter>
+                <parameter>
+                    <name>URL</name>
+                    <value>https://api.smsbroadcast.com.au/api-adv.php</value>
+                </parameter>
+                <parameter>
+                    <name>username</name>
+                    <value>username</value>
+                </parameter>
+            </parameters>
+            <script>try {&#13;
+params = JSON.parse(value),&#13;
+req = new CurlHttpRequest(),&#13;
+fields = {};&#13;
+&#13;
+payload = &quot;username=&quot;+params.username;&#13;
+payload += &quot;&amp;password=&quot;+params.password;&#13;
+payload += &quot;&amp;message=&quot;+encodeURIComponent(params.message);&#13;
+payload += &quot;&amp;to=&quot;+params.to;&#13;
+&#13;
+var resp = req.Post('https://api.smsbroadcast.com.au/api-adv.php?'+payload);&#13;
+&#13;
+if (req.Status() != 200) {&#13;
+    throw JSON.parse(resp).errors[0];&#13;
+}&#13;
+Zabbix.Log(3, 'Response : '+resp);&#13;
+Zabbix.Log(3, 'SMS payload : '+payload);&#13;
+Zabbix.Log(3, 'URL : https://api.smsbroadcast.com.au/api-adv.php?'+payload);&#13;
+return resp;&#13;
+&#13;
+} catch (error) {&#13;
+    Zabbix.Log(3, 'SMS notification failed : '+error);&#13;
+    Zabbix.Log(3, 'SMS payload : '+payload);&#13;
+    Zabbix.Log(3, 'SMS URL : https://api.smsbroadcast.com.au/api-adv.php?'+payload);&#13;
+    throw 'SMS notification failed : '+error;&#13;
+}</script>
+        </media_type>
+    </media_types>
+</zabbix_export>
